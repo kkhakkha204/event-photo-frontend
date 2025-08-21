@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 
 interface SearchResult {
@@ -7,16 +7,15 @@ interface SearchResult {
   url: string;
   matches: number;
   confidence: number;
-  faces: Array<{
-    distance: number;
-    confidence: number;
-    bbox: {
-      x: number;
-      y: number;
-      w: number;
-      h: number;
-    };
-  }>;
+  min_distance: number;
+  avg_distance: number;
+  face_count: number;
+}
+
+interface GalleryImage {
+  id: number;
+  url: string;
+  uploaded_at: string;
 }
 
 export default function Home() {
@@ -26,7 +25,29 @@ export default function Home() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string>('');
   const [mode, setMode] = useState<'strict' | 'balanced' | 'loose'>('balanced');
-  const [thresholds, setThresholds] = useState<any>(null);
+  const [showResults, setShowResults] = useState(false);
+  
+  // Gallery states
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [loadingGallery, setLoadingGallery] = useState(true);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    loadGalleryImages();
+  }, []);
+
+  const loadGalleryImages = async () => {
+    setLoadingGallery(true);
+    try {
+      const response = await api.getAllImages(0, 1000); // Load all images
+      setGalleryImages(response.images);
+      setTotal(response.total);
+    } catch (error) {
+      console.error('Error loading images:', error);
+    } finally {
+      setLoadingGallery(false);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,6 +56,7 @@ export default function Home() {
       setPreviewUrl(URL.createObjectURL(file));
       setError('');
       setResults([]);
+      setShowResults(false);
     }
   };
 
@@ -56,7 +78,7 @@ export default function Home() {
       
       if (response.success) {
         setResults(response.results);
-        setThresholds(response.thresholds);
+        setShowResults(true);
         if (response.results.length === 0) {
           setError('Không tìm thấy ảnh nào có khuôn mặt tương tự');
         }
@@ -70,108 +92,127 @@ export default function Home() {
     }
   };
 
+  const clearSearch = () => {
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setResults([]);
+    setShowResults(false);
+    setError('');
+  };
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">Tìm Ảnh Của Bạn</h1>
-          <p className="text-gray-600 mt-2">Upload ảnh chân dung để tìm tất cả ảnh có mặt bạn trong sự kiện</p>
+          <h1 className="text-3xl font-bold text-gray-900">Kho Ảnh Sự Kiện</h1>
+          <p className="text-gray-600 mt-2">
+            {showResults 
+              ? `Tìm thấy ${results.length} ảnh khớp với khuôn mặt của bạn`
+              : `Tổng cộng ${total} ảnh trong sự kiện`
+            }
+          </p>
         </div>
       </div>
 
       {/* Search Section */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6">
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="grid md:grid-cols-2 gap-6">
             {/* Upload Area */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Chọn ảnh chân dung của bạn
+                Tìm ảnh của bạn - Upload ảnh chân dung
               </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-md file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    hover:file:bg-blue-100
-                    cursor-pointer"
-                />
-              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100
+                  cursor-pointer"
+              />
             </div>
 
             {/* Preview */}
-            <div>
-              {previewUrl && (
-                <div className="relative">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                </div>
-              )}
-            </div>
+            {previewUrl && (
+              <div className="relative">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <button
+                  onClick={clearSearch}
+                  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md hover:bg-gray-100"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Search Button */}
-          <div className="mt-6">
-            {/* Mode Selection */}
-            <div className="mb-4 flex justify-center gap-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="mode"
-                  value="strict"
-                  checked={mode === 'strict'}
-                  onChange={(e) => setMode(e.target.value as any)}
-                  className="mr-2"
-                />
-                <span className="text-sm">Chính xác cao</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="mode"
-                  value="balanced"
-                  checked={mode === 'balanced'}
-                  onChange={(e) => setMode(e.target.value as any)}
-                  className="mr-2"
-                />
-                <span className="text-sm">Cân bằng</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="mode"
-                  value="loose"
-                  checked={mode === 'loose'}
-                  onChange={(e) => setMode(e.target.value as any)}
-                  className="mr-2"
-                />
-                <span className="text-sm">Tìm nhiều</span>
-              </label>
+          {/* Search Controls */}
+          {selectedFile && (
+            <div className="mt-6">
+              {/* Mode Selection */}
+              <div className="mb-4 flex justify-center gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="mode"
+                    value="strict"
+                    checked={mode === 'strict'}
+                    onChange={(e) => setMode(e.target.value as any)}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">Chính xác cao</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="mode"
+                    value="balanced"
+                    checked={mode === 'balanced'}
+                    onChange={(e) => setMode(e.target.value as any)}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">Cân bằng</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="mode"
+                    value="loose"
+                    checked={mode === 'loose'}
+                    onChange={(e) => setMode(e.target.value as any)}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">Tìm nhiều</span>
+                </label>
+              </div>
+              
+              <div className="text-center">
+                <button
+                  onClick={handleSearch}
+                  disabled={searching}
+                  className={`px-6 py-3 rounded-lg font-semibold text-white
+                    ${searching 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                    } transition-colors`}
+                >
+                  {searching ? 'Đang tìm kiếm...' : 'Tìm Ảnh'}
+                </button>
+              </div>
             </div>
-            
-            <div className="text-center">
-              <button
-                onClick={handleSearch}
-                disabled={!selectedFile || searching}
-                className={`px-6 py-3 rounded-lg font-semibold text-white
-                  ${!selectedFile || searching 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700'
-                  } transition-colors`}
-              >
-                {searching ? 'Đang tìm kiếm...' : 'Tìm Ảnh'}
-              </button>
-            </div>
-          </div>
+          )}
 
           {/* Error Message */}
           {error && (
@@ -181,73 +222,40 @@ export default function Home() {
           )}
         </div>
 
-        {/* Results Grid */}
-        {results.length > 0 && (
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold">
-                Tìm thấy {results.length} ảnh có khuôn mặt của bạn
-              </h2>
-              <div className="text-sm text-gray-600">
-                Hiển thị ảnh có độ chính xác từ cao đến thấp
-              </div>
-            </div>
-            
-            {/* Filter by confidence */}
-            <div className="mb-6 flex gap-4">
-              <button
-                onClick={() => setResults(results.filter(r => r.confidence > 0.8))}
-                className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
-              >
-                Chỉ hiện &gt;80% khớp
-              </button>
-              <button
-                onClick={() => setResults(results.filter(r => r.confidence > 0.6))}
-                className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200"
-              >
-                Chỉ hiện &gt;60% khớp
-              </button>
-              <button
-                onClick={handleSearch}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-              >
-                Hiện tất cả
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {results.map((result) => (
-                <div key={result.image_id} className="bg-white rounded-lg shadow-md overflow-hidden">
+        {/* Image Grid */}
+        {loadingGallery ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600">Đang tải ảnh...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {(showResults ? results : galleryImages).map((image: any) => (
+              <div key={image.id || image.image_id} className="relative group">
+                <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
                   <img
-                    src={result.url}
-                    alt={`Result ${result.image_id}`}
-                    className="w-full h-64 object-cover"
+                    src={image.url}
+                    alt={`Photo ${image.id || image.image_id}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="p-4">
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm text-gray-600">
-                        {result.matches} khuôn mặt
-                      </p>
-                      <span className={`text-sm font-semibold ${
-                        result.confidence > 0.8 ? 'text-green-600' : 
-                        result.confidence > 0.6 ? 'text-yellow-600' : 
-                        'text-red-600'
-                      }`}>
-                        {Math.round(result.confidence * 100)}% khớp
-                      </span>
+                  {showResults && (
+                    <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+                      {Math.round(image.confidence * 100)}% khớp
                     </div>
-                    <a
-                      href={result.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-block text-blue-600 hover:text-blue-800"
-                    >
-                      Xem ảnh gốc →
-                    </a>
-                  </div>
+                  )}
                 </div>
-              ))}
-            </div>
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300 flex items-center justify-center">
+                  <a
+                    href={image.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-white px-3 py-1 rounded text-sm"
+                  >
+                    Xem lớn
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

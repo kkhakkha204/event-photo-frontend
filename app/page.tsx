@@ -6,10 +6,8 @@ interface SearchResult {
   image_id: number;
   url: string;
   matches: number;
-  confidence: number;
   faces: Array<{
     distance: number;
-    confidence: number;
     bbox: {
       x: number;
       y: number;
@@ -135,37 +133,9 @@ export default function Home() {
         {/* Results Grid */}
         {results.length > 0 && (
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold">
-                Tìm thấy {results.length} ảnh có khuôn mặt của bạn
-              </h2>
-              <div className="text-sm text-gray-600">
-                Hiển thị ảnh có độ chính xác từ cao đến thấp
-              </div>
-            </div>
-            
-            {/* Filter by confidence */}
-            <div className="mb-6 flex gap-4">
-              <button
-                onClick={() => setResults(results.filter(r => r.confidence > 0.8))}
-                className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
-              >
-                Chỉ hiện &gt;80% khớp
-              </button>
-              <button
-                onClick={() => setResults(results.filter(r => r.confidence > 0.6))}
-                className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200"
-              >
-                Chỉ hiện &gt;60% khớp
-              </button>
-              <button
-                onClick={handleSearch}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-              >
-                Hiện tất cả
-              </button>
-            </div>
-            
+            <h2 className="text-2xl font-semibold mb-4">
+              Tìm thấy {results.length} ảnh có khuôn mặt của bạn
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {results.map((result) => (
                 <div key={result.image_id} className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -175,18 +145,9 @@ export default function Home() {
                     className="w-full h-64 object-cover"
                   />
                   <div className="p-4">
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm text-gray-600">
-                        {result.matches} khuôn mặt
-                      </p>
-                      <span className={`text-sm font-semibold ${
-                        result.confidence > 0.8 ? 'text-green-600' : 
-                        result.confidence > 0.6 ? 'text-yellow-600' : 
-                        'text-red-600'
-                      }`}>
-                        {Math.round(result.confidence * 100)}% khớp
-                      </span>
-                    </div>
+                    <p className="text-sm text-gray-600">
+                      Tìm thấy {result.matches} khuôn mặt tương tự
+                    </p>
                     <a
                       href={result.url}
                       target="_blank"

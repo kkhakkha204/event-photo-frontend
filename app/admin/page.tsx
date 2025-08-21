@@ -47,7 +47,7 @@ export default function AdminPage() {
           faces_detected: data.faces_detected,
           error: data.error
         });
-      } catch (error) {
+      } catch {
         uploadResults.push({
           file: file.name,
           success: false,

@@ -169,7 +169,7 @@ export default function Home() {
                     name="mode"
                     value="strict"
                     checked={mode === 'strict'}
-                    onChange={(e) => setMode(e.target.value as any)}
+                    onChange={(e) => setMode(e.target.value as 'strict' | 'balanced' | 'loose')}
                     className="mr-2"
                   />
                   <span className="text-sm">Chính xác cao</span>
@@ -230,32 +230,38 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {(showResults ? results : galleryImages).map((image: any) => (
-              <div key={image.id || image.image_id} className="relative group">
-                <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-                  <img
-                    src={image.url}
-                    alt={`Photo ${image.id || image.image_id}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  {showResults && (
-                    <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
-                      {Math.round(image.confidence * 100)}% khớp
-                    </div>
-                  )}
+            {(showResults ? results : galleryImages).map((image) => {
+              const imageId = 'image_id' in image ? image.image_id : image.id;
+              const imageUrl = image.url;
+              const confidence = 'confidence' in image ? image.confidence : null;
+              
+              return (
+                <div key={imageId} className="relative group">
+                  <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
+                    <img
+                      src={imageUrl}
+                      alt={`Photo ${imageId}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {showResults && confidence !== null && (
+                      <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+                        {Math.round(confidence * 100)}% khớp
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300 flex items-center justify-center">
+                    <a
+                      href={imageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-white px-3 py-1 rounded text-sm"
+                    >
+                      Xem lớn
+                    </a>
+                  </div>
                 </div>
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300 flex items-center justify-center">
-                  <a
-                    href={image.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-white px-3 py-1 rounded text-sm"
-                  >
-                    Xem lớn
-                  </a>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

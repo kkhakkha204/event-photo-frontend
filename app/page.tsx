@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { api } from '@/lib/api';
 
 interface SearchResult {
@@ -18,13 +19,15 @@ interface GalleryImage {
   uploaded_at: string;
 }
 
+type SearchMode = 'strict' | 'balanced' | 'loose';
+
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string>('');
-  const [mode, setMode] = useState<'strict' | 'balanced' | 'loose'>('balanced');
+  const [mode, setMode] = useState<SearchMode>('balanced');
   const [showResults, setShowResults] = useState(false);
   
   // Gallery states
@@ -100,6 +103,10 @@ export default function Home() {
     setError('');
   };
 
+  const handleModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMode(e.target.value as SearchMode);
+  };
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -141,14 +148,18 @@ export default function Home() {
             {/* Preview */}
             {previewUrl && (
               <div className="relative">
-                <img
+                <Image
                   src={previewUrl}
                   alt="Preview"
+                  width={400}
+                  height={192}
                   className="w-full h-48 object-cover rounded-lg"
+                  unoptimized
                 />
                 <button
                   onClick={clearSearch}
                   className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md hover:bg-gray-100"
+                  aria-label="Clear search"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -169,7 +180,7 @@ export default function Home() {
                     name="mode"
                     value="strict"
                     checked={mode === 'strict'}
-                    onChange={(e) => setMode(e.target.value as 'strict' | 'balanced' | 'loose')}
+                    onChange={handleModeChange}
                     className="mr-2"
                   />
                   <span className="text-sm">Chính xác cao</span>
@@ -180,7 +191,7 @@ export default function Home() {
                     name="mode"
                     value="balanced"
                     checked={mode === 'balanced'}
-                    onChange={(e) => setMode(e.target.value as any)}
+                    onChange={handleModeChange}
                     className="mr-2"
                   />
                   <span className="text-sm">Cân bằng</span>
@@ -191,7 +202,7 @@ export default function Home() {
                     name="mode"
                     value="loose"
                     checked={mode === 'loose'}
-                    onChange={(e) => setMode(e.target.value as any)}
+                    onChange={handleModeChange}
                     className="mr-2"
                   />
                   <span className="text-sm">Tìm nhiều</span>
@@ -238,10 +249,13 @@ export default function Home() {
               return (
                 <div key={imageId} className="relative group">
                   <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={`Photo ${imageId}`}
+                      width={300}
+                      height={300}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      unoptimized
                     />
                     {showResults && confidence !== null && (
                       <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">

@@ -8,7 +8,12 @@ interface SearchResult {
   matches: number;
   faces: Array<{
     distance: number;
-    bbox: any;
+    bbox: {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+    };
   }>;
 }
 
@@ -46,7 +51,7 @@ export default function Home() {
       } else {
         setError(response.message || 'Có lỗi xảy ra');
       }
-    } catch (err) {
+    } catch {
       setError('Không thể kết nối với server');
     } finally {
       setSearching(false);

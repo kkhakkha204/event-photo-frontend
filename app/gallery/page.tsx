@@ -1,7 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Image {
   id: number;
@@ -16,11 +17,7 @@ export default function GalleryPage() {
   const [page, setPage] = useState(0);
   const limit = 12;
 
-  useEffect(() => {
-    loadImages();
-  }, [page]);
-
-  const loadImages = async () => {
+  const loadImages = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.getAllImages(page * limit, limit);
@@ -31,7 +28,11 @@ export default function GalleryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
+
+  useEffect(() => {
+    loadImages();
+  }, [loadImages]);
 
   const totalPages = Math.ceil(total / limit);
 

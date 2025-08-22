@@ -151,7 +151,7 @@ export default function EmbedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffafa] p-3 sm:p-4 lg:p-6">
+    <div className="min-h-screen p-3 sm:p-4 lg:p-6">
       {/* Subtle gradient overlay */}
       <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-[#EC2789] via-transparent to-[#522E90]"></div>

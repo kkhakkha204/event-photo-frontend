@@ -142,13 +142,55 @@ export default function EmbedPage() {
     }
   };
 
-  const openImage = (url: string) => {
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
+
+  const getCurrentImages = () => {
+    return showResults ? results : galleryImages;
+  };
+
+  const openImage = (url: string, index: number) => {
     setSelectedImage(url);
+    setSelectedImageIndex(index);
   };
 
   const closeImage = () => {
     setSelectedImage(null);
+    setSelectedImageIndex(-1);
   };
+
+  const navigateImage = (direction: 'prev' | 'next') => {
+    const images = getCurrentImages();
+    if (selectedImageIndex === -1) return;
+
+    let newIndex = selectedImageIndex;
+    if (direction === 'prev') {
+      newIndex = selectedImageIndex > 0 ? selectedImageIndex - 1 : images.length - 1;
+    } else {
+      newIndex = selectedImageIndex < images.length - 1 ? selectedImageIndex + 1 : 0;
+    }
+
+    const newImage = images[newIndex];
+    const newUrl = newImage.url;
+    setSelectedImage(newUrl);
+    setSelectedImageIndex(newIndex);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedImage) return;
+      
+      if (e.key === 'Escape') {
+        closeImage();
+      } else if (e.key === 'ArrowLeft') {
+        navigateImage('prev');
+      } else if (e.key === 'ArrowRight') {
+        navigateImage('next');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedImage, selectedImageIndex]);
 
   return (
     <div className="min-h-screen bg-[#fffafa] p-3 sm:p-4 lg:p-6">
@@ -157,7 +199,7 @@ export default function EmbedPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#EC2789] via-transparent to-[#522E90]"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto z-10">
+      <div className="relative max-w-7xl mx-auto">
         {/* Search Section */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">
@@ -395,7 +437,7 @@ export default function EmbedPage() {
                   <div 
                     key={imageId} 
                     className="group relative cursor-pointer"
-                    onClick={() => openImage(imageUrl)}
+                    onClick={() => openImage(imageUrl, index)}
                     style={{
                       animationDelay: `${index * 0.05}s`,
                       animation: 'fadeInUp 0.6s ease-out forwards',
@@ -448,21 +490,58 @@ export default function EmbedPage() {
 
       {/* Lightbox Modal */}
       {selectedImage && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" onClick={closeImage}>
-          <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={selectedImage}
-              alt="Full size"
-              className="max-w-full max-h-full object-contain rounded-lg"
-            />
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" onClick={closeImage}>
+          <div className="relative w-full h-full flex items-center justify-center px-4 py-16 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            {/* Close Button - Fixed Position */}
             <button
               onClick={closeImage}
-              className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-200 flex items-center justify-center"
+              className="fixed top-4 right-4 z-10 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full shadow-lg hover:bg-black/70 transition-all duration-200 flex items-center justify-center border border-white/20"
             >
-              <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+
+            {/* Navigation Arrows */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateImage('prev');
+              }}
+              className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full shadow-lg hover:bg-black/70 transition-all duration-200 flex items-center justify-center border border-white/20"
+            >
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateImage('next');
+              }}
+              className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full shadow-lg hover:bg-black/70 transition-all duration-200 flex items-center justify-center border border-white/20"
+            >
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Image Container */}
+            <div className="max-w-[90vw] max-h-[80vh] flex items-center justify-center">
+              <img
+                src={selectedImage}
+                alt="Full size"
+                className="max-w-full max-h-full object-contain rounded-lg"
+              />
+            </div>
+
+            {/* Image Counter */}
+            {selectedImageIndex !== -1 && (
+              <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm font-medium border border-white/20">
+                {selectedImageIndex + 1} / {getCurrentImages().length}
+              </div>
+            )}
           </div>
         </div>
       )}

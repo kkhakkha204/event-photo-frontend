@@ -112,39 +112,63 @@ export default function EmbedPage() {
 
   const getModeDescription = (modeType: 'strict' | 'balanced' | 'loose') => {
     const descriptions = {
-      strict: 'Độ chính xác cao',
-      balanced: 'Cân bằng tối ưu',
-      loose: 'Tìm kiếm rộng'
+      strict: 'Chính xác cao',
+      balanced: 'Cân bằng',
+      loose: 'Tìm rộng'
     };
     return descriptions[modeType];
   };
 
+  const getModeIcon = (modeType: 'strict' | 'balanced' | 'loose') => {
+    if (modeType === 'strict') {
+      return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    } else if (modeType === 'balanced') {
+      return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+      );
+    } else {
+      return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#fffafa] p-3 sm:p-4 lg:p-6">
-      {/* Subtle background pattern */}
-      <div className="fixed inset-0 opacity-30 pointer-events-none">
-        <div className="absolute top-20 right-10 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-20 left-10 w-40 h-40 bg-purple-400/10 rounded-full blur-2xl"></div>
+    <div className="min-h-screen bg-[#fffafa] p-4 sm:p-6 lg:p-8">
+      {/* Subtle gradient overlay */}
+      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#EC2789] via-transparent to-[#522E90]"></div>
       </div>
 
-      <div className="relative max-w-6xl mx-auto">
+      <div className="relative max-w-7xl mx-auto">
         {/* Search Section */}
-        <div className="backdrop-blur-sm bg-white/80 rounded-2xl shadow-lg shadow-black/5 border border-white/20 p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-xl shadow-lg">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#EC2789] to-[#522E90] rounded-2xl flex items-center justify-center shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#EC2789] rounded-full animate-pulse"></div>
             </div>
             <div>
-              <h2 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold text-gray-900">
                 Tìm Ảnh Của Bạn
               </h2>
-              <p className="text-sm text-gray-600 mt-1">Upload ảnh chân dung để tìm kiếm khoảnh khắc có bạn</p>
+              <p className="text-gray-500 mt-1">Upload ảnh chân dung để tìm kiếm trong bộ sưu tập</p>
             </div>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-6 items-start">
+          <div className="grid lg:grid-cols-2 gap-8">
             {/* Upload Area */}
             <div className="space-y-4">
               <div className="relative">
@@ -157,21 +181,23 @@ export default function EmbedPage() {
                 />
                 <label 
                   htmlFor="file-upload-embed"
-                  className={`relative flex flex-col items-center justify-center w-full h-36 sm:h-40
-                    border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300
+                  className={`relative flex flex-col items-center justify-center w-full h-48
+                    border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300
                     ${selectedFile 
-                      ? 'border-blue-400 bg-blue-50/50' 
-                      : 'border-gray-300 hover:border-blue-400 bg-gray-50/50 hover:bg-blue-50/30'
+                      ? 'border-[#EC2789] bg-gradient-to-br from-[#EC2789]/5 to-[#522E90]/5' 
+                      : 'border-gray-200 hover:border-[#EC2789]/50 bg-gray-50 hover:bg-gradient-to-br hover:from-[#EC2789]/5 hover:to-[#522E90]/5'
                     }`}
                 >
-                  <div className="flex flex-col items-center justify-center p-4">
-                    <svg className="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <p className="text-sm text-gray-600 font-medium text-center">
+                  <div className="flex flex-col items-center justify-center p-6">
+                    <div className="w-16 h-16 mb-4 bg-gradient-to-br from-[#EC2789]/10 to-[#522E90]/10 rounded-2xl flex items-center justify-center">
+                      <svg className="w-8 h-8 text-[#522E90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </div>
+                    <p className="text-base font-medium text-gray-700">
                       {selectedFile ? selectedFile.name : 'Chọn ảnh chân dung'}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">PNG, JPG (MAX. 10MB)</p>
+                    <p className="text-sm text-gray-500 mt-2">PNG, JPG (tối đa 10MB)</p>
                   </div>
                 </label>
               </div>
@@ -179,26 +205,30 @@ export default function EmbedPage() {
 
             {/* Preview */}
             {previewUrl && (
-              <div className="space-y-3">
-                <div className="relative overflow-hidden rounded-xl shadow-lg">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="w-full h-36 sm:h-40 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                  <button
-                    onClick={clearSearch}
-                    className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-all duration-200"
-                  >
-                    <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+              <div className="space-y-4">
+                <div className="relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#EC2789]/10 to-[#522E90]/10 p-1">
+                  <div className="relative rounded-xl overflow-hidden bg-white">
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-full h-48 object-contain bg-gray-50"
+                    />
+                    <button
+                      onClick={clearSearch}
+                      className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-200 flex items-center justify-center"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 <div className="text-center">
-                  <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                    ✓ Sẵn sàng tìm kiếm
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#EC2789]/10 to-[#522E90]/10 text-[#522E90] rounded-full text-sm font-medium">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Sẵn sàng tìm kiếm
                   </span>
                 </div>
               </div>
@@ -207,17 +237,13 @@ export default function EmbedPage() {
 
           {/* Search Controls */}
           {selectedFile && (
-            <div className="space-y-4 pt-6 border-t border-gray-200/60 mt-6">
+            <div className="space-y-6 pt-8 border-t border-gray-100 mt-8">
               {/* Mode Selection */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-900">Chế độ tìm kiếm</h4>
-                <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Chế độ tìm kiếm</h4>
+                <div className="grid grid-cols-3 gap-3">
                   {(['strict', 'balanced', 'loose'] as const).map((modeType) => (
-                    <label key={modeType} className={`relative flex flex-col p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
-                      mode === modeType 
-                        ? 'border-blue-500 bg-blue-50 shadow-sm' 
-                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-                    }`}>
+                    <label key={modeType} className="relative cursor-pointer">
                       <input
                         type="radio"
                         name="mode"
@@ -226,19 +252,30 @@ export default function EmbedPage() {
                         onChange={(e) => setMode(e.target.value as 'strict' | 'balanced' | 'loose')}
                         className="sr-only"
                       />
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-gray-900">
-                          {getModeDescription(modeType)}
-                        </span>
-                        <div className={`w-3 h-3 rounded-full border ${
-                          mode === modeType 
-                            ? 'border-blue-500 bg-blue-500' 
-                            : 'border-gray-300'
-                        }`}>
-                          {mode === modeType && (
-                            <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                          )}
+                      <div className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                        mode === modeType 
+                          ? 'border-[#EC2789] bg-gradient-to-br from-[#EC2789]/5 to-[#522E90]/5 shadow-md' 
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}>
+                        <div className="flex flex-col items-center gap-2">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-300 ${
+                            mode === modeType 
+                              ? 'bg-gradient-to-br from-[#EC2789] to-[#522E90] text-white' 
+                              : 'bg-gray-100 text-gray-500'
+                          }`}>
+                            {getModeIcon(modeType)}
+                          </div>
+                          <span className={`text-sm font-medium transition-colors duration-300 ${
+                            mode === modeType ? 'text-[#522E90]' : 'text-gray-600'
+                          }`}>
+                            {getModeDescription(modeType)}
+                          </span>
                         </div>
+                        {mode === modeType && (
+                          <div className="absolute top-2 right-2">
+                            <div className="w-2 h-2 bg-[#EC2789] rounded-full animate-pulse"></div>
+                          </div>
+                        )}
                       </div>
                     </label>
                   ))}
@@ -246,25 +283,30 @@ export default function EmbedPage() {
               </div>
               
               {/* Search Button */}
-              <div className="text-center pt-2">
+              <div className="flex justify-center pt-2">
                 <button
                   onClick={handleSearch}
                   disabled={searching}
-                  className={`relative inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white
-                    transition-all duration-300 shadow-lg min-w-[140px]
+                  className={`relative inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-white
+                    transition-all duration-300 min-w-[180px] shadow-lg
                     ${searching 
-                      ? 'bg-gray-400 cursor-not-allowed scale-95' 
-                      : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 hover:shadow-xl hover:scale-105 active:scale-95'
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-gradient-to-r from-[#EC2789] to-[#522E90] hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
                     }`}
                 >
-                  {searching && (
-                    <div className="absolute left-4">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  {searching ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Đang tìm kiếm...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <span>Tìm kiếm</span>
                     </div>
                   )}
-                  <span className={searching ? 'ml-4' : ''}>
-                    {searching ? 'Đang tìm...' : 'Tìm kiếm'}
-                  </span>
                 </button>
               </div>
             </div>
@@ -272,54 +314,35 @@ export default function EmbedPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="relative p-3 bg-red-50 border border-red-200 rounded-lg mt-4">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <svg className="w-4 h-4 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
+                  <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
-                <div className="ml-2">
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
+                <p className="text-sm text-red-700">{error}</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Results Header */}
-        <div className="flex items-center justify-between mb-4 lg:mb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-tr from-gray-500 to-gray-600 rounded-lg">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#EC2789]/10 to-[#522E90]/10 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#522E90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
             <div>
-              <h3 className="text-lg lg:text-xl font-bold text-gray-900">
-                {showResults 
-                  ? `Kết quả tìm kiếm`
-                  : `Thư viện ảnh sự kiện`
-                }
+              <h3 className="text-xl font-bold text-gray-900">
+                {showResults ? 'Kết quả tìm kiếm' : 'Thư viện ảnh'}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-500 mt-0.5">
                 {showResults 
-                  ? (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="inline-flex items-center justify-center w-5 h-5 bg-green-500 text-white rounded-full text-xs font-medium">
-                          {results.length}
-                        </span>
-                        ảnh khớp với khuôn mặt
-                      </span>
-                    )
-                  : (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white rounded-full text-xs font-medium">
-                          {total}
-                        </span>
-                        ảnh trong bộ sưu tập
-                      </span>
-                    )
+                  ? `Tìm thấy ${results.length} ảnh phù hợp`
+                  : `${total} ảnh trong bộ sưu tập`
                 }
               </p>
             </div>
@@ -328,9 +351,9 @@ export default function EmbedPage() {
           {showResults && results.length > 0 && (
             <button
               onClick={clearSearch}
-              className="inline-flex items-center px-3 py-2 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm"
             >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
               </svg>
               Xem tất cả
@@ -340,16 +363,18 @@ export default function EmbedPage() {
 
         {/* Image Grid */}
         {loadingGallery ? (
-          <div className="text-center py-12 lg:py-16">
-            <div className="relative mb-4">
-              <div className="w-12 h-12 border-3 border-blue-200 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 border-3 border-purple-200 border-t-purple-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '0.8s'}}></div>
+          <div className="text-center py-20">
+            <div className="relative inline-flex">
+              <div className="w-16 h-16 border-4 border-[#EC2789]/20 border-t-[#EC2789] rounded-full animate-spin"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-8 h-8 border-4 border-[#522E90]/20 border-t-[#522E90] rounded-full animate-spin" style={{animationDirection: 'reverse'}}></div>
+              </div>
             </div>
-            <p className="text-gray-600 font-medium">Đang tải ảnh...</p>
-            <p className="text-sm text-gray-500 mt-1">Vui lòng đợi trong giây lát</p>
+            <p className="text-gray-600 font-medium mt-6">Đang tải thư viện ảnh</p>
+            <p className="text-sm text-gray-500 mt-2">Vui lòng đợi trong giây lát...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {(showResults ? results : galleryImages).map((image, index) => {
               const imageId = 'image_id' in image ? image.image_id : image.id;
               const imageUrl = image.url;
@@ -360,46 +385,49 @@ export default function EmbedPage() {
                   key={imageId} 
                   className="group relative"
                   style={{
-                    animationDelay: `${index * 0.03}s`,
-                    animation: 'fadeInUp 0.5s ease-out forwards',
-                    opacity: 0,
-                    transform: 'translateY(15px)'
+                    animationDelay: `${index * 0.05}s`,
+                    animation: 'fadeInUp 0.6s ease-out forwards',
+                    opacity: 0
                   }}
                 >
-                  <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 shadow-sm group-hover:shadow-lg transition-all duration-300">
+                  <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100">
                     <img
                       src={imageUrl}
                       alt={`Photo ${imageId}`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     />
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
                     {/* Confidence Badge */}
                     {showResults && confidence !== null && (
-                      <div className="absolute top-2 right-2">
-                        <div className={`px-2 py-1 rounded-md text-xs font-medium backdrop-blur-sm ${
+                      <div className="absolute top-3 right-3 transform group-hover:scale-110 transition-transform duration-300">
+                        <div className={`px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md ${
                           confidence >= 0.8 
-                            ? 'bg-green-500/90 text-white' 
+                            ? 'bg-gradient-to-r from-green-500/90 to-emerald-500/90 text-white shadow-lg' 
                             : confidence >= 0.6
-                            ? 'bg-yellow-500/90 text-white'
-                            : 'bg-orange-500/90 text-white'
+                            ? 'bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-white shadow-lg'
+                            : 'bg-gradient-to-r from-orange-500/90 to-red-500/90 text-white shadow-lg'
                         }`}>
                           {Math.round(confidence * 100)}%
                         </div>
                       </div>
                     )}
                     
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center p-2">
+                    {/* Hover Actions */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
                       <a
                         href={imageUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-lg text-xs font-medium text-gray-900 hover:bg-white transition-all duration-200 shadow-lg transform translate-y-1 group-hover:translate-y-0"
+                        className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white/95 backdrop-blur-md rounded-lg text-sm font-medium text-gray-900 hover:bg-white transition-all duration-200 shadow-lg"
                       >
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
-                        Xem
+                        Xem chi tiết
                       </a>
                     </div>
                   </div>

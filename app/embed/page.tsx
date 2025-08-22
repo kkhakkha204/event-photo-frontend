@@ -151,9 +151,13 @@ export default function EmbedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffafa]/10 p-3 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-[#fffafa] p-3 sm:p-4 lg:p-6">
+      {/* Subtle gradient overlay */}
+      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#EC2789] via-transparent to-[#522E90]"></div>
+      </div>
 
-      <div className="relative max-w-7xl mx-auto">
+      <div className="relative max-w-7xl mx-auto z-10">
         {/* Search Section */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">

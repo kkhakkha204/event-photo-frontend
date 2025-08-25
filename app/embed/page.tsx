@@ -288,7 +288,7 @@ export default function EmbedPage() {
 
           {/* Search Controls */}
           {selectedFile && (
-            <div className="space-y-5 pt-6 border-t border-gray-100 mt-6">
+            <div className="hidden space-y-5 pt-6 border-t border-gray-100 mt-6">
               {/* Mode Selection */}
               <div className="space-y-3">
                 <h4 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wider">Chế độ tìm kiếm</h4>
@@ -456,7 +456,7 @@ export default function EmbedPage() {
                       
                       {/* Confidence Badge */}
                       {showResults && confidence !== null && (
-                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 transform group-hover:scale-110 transition-transform duration-300">
+                        <div className="hidden absolute top-2 right-2 sm:top-3 sm:right-3 transform group-hover:scale-110 transition-transform duration-300">
                           <div className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold backdrop-blur-md ${
                             confidence >= 0.8 
                               ? 'bg-gradient-to-r from-green-500/90 to-emerald-500/90 text-white shadow-lg' 

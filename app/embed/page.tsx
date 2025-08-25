@@ -288,9 +288,9 @@ export default function EmbedPage() {
 
           {/* Search Controls */}
           {selectedFile && (
-            <div className="hidden space-y-5 pt-6 border-t border-gray-100 mt-6">
+            <div className="space-y-5 pt-6 border-t border-gray-100 mt-6">
               {/* Mode Selection */}
-              <div className="space-y-3">
+              <div className="hidden space-y-3">
                 <h4 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wider">Chế độ tìm kiếm</h4>
                 <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {(['strict', 'balanced', 'loose'] as const).map((modeType) => (

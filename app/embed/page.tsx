@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/api';
+
 interface SearchResult {
   image_id: number;
   url: string;
@@ -16,29 +18,10 @@ interface GalleryImage {
   id: number;
   url: string;
   uploaded_at?: string; // Make optional
+  face_count?: number;
+  event_id?: number;
+  processed?: number;
 }
-
-// Mock API for demo
-const api = {
-  getAllImages: async (skip: number, limit: number) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const mockImages: GalleryImage[] = [];
-    for (let i = 1; i <= 20; i++) {
-      mockImages.push({
-        id: i,
-        url: `https://picsum.photos/400/400?random=${i}`,
-        uploaded_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
-      });
-    }
-    
-    return {
-      images: mockImages,
-      total: mockImages.length
-    };
-  }
-};
 
 export default function EmbedPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

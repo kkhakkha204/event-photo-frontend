@@ -1,15 +1,15 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
 
+import { useState, useEffect } from 'react';
 interface SearchResult {
   image_id: number;
   url: string;
-  matches: number;
+  matches?: number;
   confidence: number;
   min_distance: number;
   avg_distance: number;
   face_count: number;
+  uploaded_at?: string; // Make optional
 }
 
 interface GalleryImage {
@@ -17,6 +17,28 @@ interface GalleryImage {
   url: string;
   uploaded_at?: string; // Make optional
 }
+
+// Mock API for demo
+const api = {
+  getAllImages: async (skip: number, limit: number) => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const mockImages: GalleryImage[] = [];
+    for (let i = 1; i <= 20; i++) {
+      mockImages.push({
+        id: i,
+        url: `https://picsum.photos/400/400?random=${i}`,
+        uploaded_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
+      });
+    }
+    
+    return {
+      images: mockImages,
+      total: mockImages.length
+    };
+  }
+};
 
 export default function EmbedPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -81,7 +103,7 @@ export default function EmbedPage() {
       const formData = new FormData();
       formData.append('file', selectedFile);
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/search?mode=${mode}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/api/search?mode=${mode}`, {
         method: 'POST',
         body: formData
       });
@@ -192,6 +214,16 @@ export default function EmbedPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedImage, selectedImageIndex]);
 
+  // Format date safely
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('vi-VN');
+    } catch {
+      return 'N/A';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#fffafa] p-3 sm:p-4 lg:p-6">
       {/* Subtle gradient overlay */}
@@ -286,80 +318,33 @@ export default function EmbedPage() {
             )}
           </div>
 
-          {/* Search Controls */}
+          {/* Search Button */}
           {selectedFile && (
-            <div className="space-y-5 pt-6 border-t border-gray-100 mt-6">
-              {/* Mode Selection */}
-              <div className="hidden space-y-3">
-                <h4 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wider">Chế độ tìm kiếm</h4>
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {(['strict', 'balanced', 'loose'] as const).map((modeType) => (
-                    <label key={modeType} className="relative cursor-pointer">
-                      <input
-                        type="radio"
-                        name="mode"
-                        value={modeType}
-                        checked={mode === modeType}
-                        onChange={(e) => setMode(e.target.value as 'strict' | 'balanced' | 'loose')}
-                        className="sr-only"
-                      />
-                      <div className={`relative p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all duration-300 ${
-                        mode === modeType 
-                          ? 'border-[#EC2789] bg-gradient-to-br from-[#EC2789]/5 to-[#522E90]/5 shadow-md' 
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}>
-                        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors duration-300 ${
-                            mode === modeType 
-                              ? 'bg-gradient-to-br from-[#EC2789] to-[#522E90] text-white' 
-                              : 'bg-gray-100 text-gray-500'
-                          }`}>
-                            {getModeIcon(modeType)}
-                          </div>
-                          <span className={`text-xs sm:text-sm font-medium transition-colors duration-300 ${
-                            mode === modeType ? 'text-[#522E90]' : 'text-gray-600'
-                          }`}>
-                            {getModeDescription(modeType)}
-                          </span>
-                        </div>
-                        {mode === modeType && (
-                          <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2">
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#EC2789] rounded-full animate-pulse"></div>
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Search Button */}
-              <div className="flex justify-center pt-1">
-                <button
-                  onClick={handleSearch}
-                  disabled={searching}
-                  className={`relative inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base font-semibold text-white
-                    transition-all duration-300 min-w-[160px] sm:min-w-[180px] shadow-lg
-                    ${searching 
-                      ? 'bg-gray-400 cursor-not-allowed' 
-                      : 'bg-gradient-to-r from-[#EC2789] to-[#522E90] hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
-                    }`}
-                >
-                  {searching ? (
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>Đang tìm kiếm...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                      <span>Tìm kiếm</span>
-                    </div>
-                  )}
-                </button>
-              </div>
+            <div className="flex justify-center pt-6 mt-6 border-t border-gray-100">
+              <button
+                onClick={handleSearch}
+                disabled={searching}
+                className={`relative inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base font-semibold text-white
+                  transition-all duration-300 min-w-[160px] sm:min-w-[180px] shadow-lg
+                  ${searching 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-[#EC2789] to-[#522E90] hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
+                  }`}
+              >
+                {searching ? (
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Đang tìm kiếm...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>Tìm kiếm</span>
+                  </div>
+                )}
+              </button>
             </div>
           )}
 
@@ -378,7 +363,7 @@ export default function EmbedPage() {
           )}
         </div>
 
-        {/* Gallery Section - White Background */}
+        {/* Gallery Section */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
           {/* Results Header */}
           <div className="flex items-center justify-between mb-5">
@@ -419,12 +404,8 @@ export default function EmbedPage() {
             <div className="text-center py-16 sm:py-20">
               <div className="relative inline-flex">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-[#EC2789]/20 border-t-[#EC2789] rounded-full animate-spin"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-[#522E90]/20 border-t-[#522E90] rounded-full animate-spin" style={{animationDirection: 'reverse'}}></div>
-                </div>
               </div>
               <p className="text-sm sm:text-base text-gray-600 font-medium mt-5">Đang tải thư viện ảnh</p>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1.5">Vui lòng đợi trong giây lát...</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
@@ -438,11 +419,6 @@ export default function EmbedPage() {
                     key={imageId} 
                     className="group relative cursor-pointer"
                     onClick={() => openImage(imageUrl, index)}
-                    style={{
-                      animationDelay: `${index * 0.05}s`,
-                      animation: 'fadeInUp 0.6s ease-out forwards',
-                      opacity: 0
-                    }}
                   >
                     <div className="relative aspect-square overflow-hidden rounded-lg sm:rounded-xl bg-gray-100">
                       <img
@@ -451,34 +427,20 @@ export default function EmbedPage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                       />
                       
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      
                       {/* Confidence Badge */}
                       {showResults && confidence !== null && (
-                        <div className="hidden absolute top-2 right-2 sm:top-3 sm:right-3 transform group-hover:scale-110 transition-transform duration-300">
-                          <div className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold backdrop-blur-md ${
+                        <div className="absolute top-2 right-2 transform group-hover:scale-110 transition-transform duration-300">
+                          <div className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-md ${
                             confidence >= 0.8 
-                              ? 'bg-gradient-to-r from-green-500/90 to-emerald-500/90 text-white shadow-lg' 
+                              ? 'bg-green-500/90 text-white' 
                               : confidence >= 0.6
-                              ? 'bg-gradient-to-r from-yellow-500/90 to-amber-500/90 text-white shadow-lg'
-                              : 'bg-gradient-to-r from-orange-500/90 to-red-500/90 text-white shadow-lg'
+                              ? 'bg-yellow-500/90 text-white'
+                              : 'bg-orange-500/90 text-white'
                           }`}>
                             {Math.round(confidence * 100)}%
                           </div>
                         </div>
                       )}
-                      
-                      {/* View Icon - Desktop Only */}
-                      <div className="hidden sm:flex absolute bottom-0 left-0 right-0 p-3 sm:p-4 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="flex items-center justify-center gap-1.5 px-3 py-2 bg-white/95 backdrop-blur-md rounded-lg text-xs font-medium text-gray-900 shadow-lg">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          Xem
-                        </div>
-                      </div>
                     </div>
                   </div>
                 );
@@ -491,69 +453,23 @@ export default function EmbedPage() {
       {/* Lightbox Modal */}
       {selectedImage && (
         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" onClick={closeImage}>
-          <div className="relative w-full h-full flex items-center justify-center px-4 py-16 sm:p-8" onClick={(e) => e.stopPropagation()}>
-            {/* Close Button - Fixed Position */}
-            <button
-              onClick={closeImage}
-              className="fixed top-4 right-4 z-10 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full shadow-lg hover:bg-black/70 transition-all duration-200 flex items-center justify-center border border-white/20"
-            >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            {/* Navigation Arrows */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage('prev');
-              }}
-              className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full shadow-lg hover:bg-black/70 transition-all duration-200 flex items-center justify-center border border-white/20"
-            >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage('next');
-              }}
-              className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full shadow-lg hover:bg-black/70 transition-all duration-200 flex items-center justify-center border border-white/20"
-            >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            {/* Image Container */}
-            <div className="max-w-[90vw] max-h-[80vh] flex items-center justify-center">
-              <img
-                src={selectedImage}
-                alt="Full size"
-                className="max-w-full max-h-full object-contain rounded-lg"
-              />
-            </div>
-
-            {/* Image Counter */}
-            {selectedImageIndex !== -1 && (
-              <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm font-medium border border-white/20">
-                {selectedImageIndex + 1} / {getCurrentImages().length}
-              </div>
-            )}
-          </div>
+          <button
+            onClick={closeImage}
+            className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <img
+            src={selectedImage}
+            alt="Full size"
+            className="max-w-[90vw] max-h-[90vh] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }

@@ -11,13 +11,13 @@ interface SearchResult {
   min_distance: number;
   avg_distance: number;
   face_count: number;
-  uploaded_at?: string; // Make optional
+  uploaded_at?: string;
 }
 
 interface GalleryImage {
   id: number;
   url: string;
-  uploaded_at?: string; // Make optional
+  uploaded_at?: string;
   face_count?: number;
   event_id?: number;
   processed?: number;

@@ -55,7 +55,8 @@ export default function EmbedPage() {
   const loadGalleryImages = async () => {
     setLoadingGallery(true);
     try {
-      const response = await api.getAllImages(0, 1000);
+      // Try smaller limit first
+      const response = await api.getAllImages(0, 100);  // Changed from 1000 to 100
       
       // Check if response has images array
       if (response && response.images && Array.isArray(response.images)) {

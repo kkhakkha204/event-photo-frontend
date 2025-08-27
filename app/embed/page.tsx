@@ -56,10 +56,22 @@ export default function EmbedPage() {
     setLoadingGallery(true);
     try {
       const response = await api.getAllImages(0, 1000);
-      setGalleryImages(response.images);
-      setTotal(response.total);
+      
+      // Check if response has images array
+      if (response && response.images && Array.isArray(response.images)) {
+        setGalleryImages(response.images);
+        setTotal(response.total || response.images.length);
+      } else {
+        console.error('Invalid response format:', response);
+        setGalleryImages([]);
+        setTotal(0);
+        setError('Không thể tải thư viện ảnh');
+      }
     } catch (error) {
       console.error('Error loading images:', error);
+      setGalleryImages([]);
+      setTotal(0);
+      setError('Lỗi kết nối với server');
     } finally {
       setLoadingGallery(false);
     }

@@ -11,13 +11,13 @@ interface SearchResult {
   min_distance: number;
   avg_distance: number;
   face_count: number;
-  uploaded_at?: string; // Make optional
+  uploaded_at?: string;
 }
 
 interface GalleryImage {
   id: number;
   url: string;
-  uploaded_at?: string; // Make optional
+  uploaded_at?: string;
   face_count?: number;
   event_id?: number;
   processed?: number;
@@ -32,15 +32,13 @@ export default function EmbedPage() {
   const [mode, setMode] = useState<'strict' | 'balanced' | 'loose'>('balanced');
   const [showResults, setShowResults] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  
-  // Gallery states
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(true);
   const [total, setTotal] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
 
   useEffect(() => {
     loadGalleryImages();
-    // Send height to parent
     const sendHeight = () => {
       const height = document.body.scrollHeight;
       window.parent.postMessage({ type: 'resize', height }, '*');
@@ -55,10 +53,8 @@ export default function EmbedPage() {
   const loadGalleryImages = async () => {
     setLoadingGallery(true);
     try {
-      // Try smaller limit first
-      const response = await api.getAllImages(0, 100);  // Changed from 1000 to 100
+      const response = await api.getAllImages(0, 100);
       
-      // Check if response has images array
       if (response && response.images && Array.isArray(response.images)) {
         setGalleryImages(response.images);
         setTotal(response.total || response.images.length);
@@ -129,39 +125,6 @@ export default function EmbedPage() {
     setError('');
   };
 
-  const getModeDescription = (modeType: 'strict' | 'balanced' | 'loose') => {
-    const descriptions = {
-      strict: 'Chính xác',
-      balanced: 'Cân bằng',
-      loose: 'Tìm rộng'
-    };
-    return descriptions[modeType];
-  };
-
-  const getModeIcon = (modeType: 'strict' | 'balanced' | 'loose') => {
-    if (modeType === 'strict') {
-      return (
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      );
-    } else if (modeType === 'balanced') {
-      return (
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-        </svg>
-      );
-    } else {
-      return (
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      );
-    }
-  };
-
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
-
   const getCurrentImages = () => {
     return showResults ? results : galleryImages;
   };
@@ -210,26 +173,11 @@ export default function EmbedPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedImage, selectedImageIndex]);
 
-  // Format date safely
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
-    try {
-      return new Date(dateString).toLocaleDateString('vi-VN');
-    } catch {
-      return 'N/A';
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#fffafa] p-3 sm:p-4 lg:p-6">
-      {/* Subtle gradient overlay */}
-      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#EC2789] via-transparent to-[#522E90]"></div>
-      </div>
-
-      <div className="relative max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Search Section */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <div>
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
@@ -253,14 +201,14 @@ export default function EmbedPage() {
                 <label 
                   htmlFor="file-upload-embed"
                   className={`relative flex flex-col items-center justify-center w-full h-40 sm:h-48
-                    border-2 border-dashed rounded-xl sm:rounded-2xl cursor-pointer transition-all duration-300
+                    border-2 border-dashed rounded-xl cursor-pointer
                     ${selectedFile 
-                      ? 'border-[#EC2789] bg-gradient-to-br from-[#EC2789]/5 to-[#522E90]/5' 
-                      : 'border-gray-200 hover:border-[#EC2789]/50 bg-gray-50 hover:bg-gradient-to-br hover:from-[#EC2789]/5 hover:to-[#522E90]/5'
+                      ? 'border-[#EC2789] bg-[#EC2789]/5' 
+                      : 'border-gray-200 bg-gray-50'
                     }`}
                 >
                   <div className="flex flex-col items-center justify-center p-4">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 mb-3 bg-gradient-to-br from-[#EC2789]/10 to-[#522E90]/10 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 mb-3 bg-[#EC2789]/10 rounded-xl flex items-center justify-center">
                       <svg className="w-7 h-7 sm:w-8 sm:h-8 text-[#522E90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                       </svg>
@@ -277,8 +225,8 @@ export default function EmbedPage() {
             {/* Preview */}
             {previewUrl && (
               <div className="space-y-3">
-                <div className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#EC2789]/10 to-[#522E90]/10 p-1">
-                  <div className="relative rounded-lg sm:rounded-xl overflow-hidden bg-white">
+                <div className="relative rounded-xl overflow-hidden shadow-lg bg-[#EC2789]/10 p-1">
+                  <div className="relative rounded-lg overflow-hidden bg-white">
                     <img
                       src={previewUrl}
                       alt="Preview"
@@ -286,7 +234,7 @@ export default function EmbedPage() {
                     />
                     <button
                       onClick={clearSearch}
-                      className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-200 flex items-center justify-center"
+                      className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 bg-white/90 rounded-full shadow-lg flex items-center justify-center"
                     >
                       <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -304,11 +252,10 @@ export default function EmbedPage() {
               <button
                 onClick={handleSearch}
                 disabled={searching}
-                className={`relative inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base font-semibold text-white
-                  transition-all duration-300 min-w-[160px] sm:min-w-[180px] shadow-lg
+                className={`inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 rounded-xl text-sm sm:text-base font-semibold text-white min-w-[160px] sm:min-w-[180px] shadow-lg
                   ${searching 
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-[#EC2789] to-[#522E90] hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
+                    : 'bg-gradient-to-r from-[#EC2789] to-[#522E90]'
                   }`}
               >
                 {searching ? (
@@ -317,9 +264,7 @@ export default function EmbedPage() {
                     <span>Đang tìm kiếm...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center">
-                    <span>Tìm kiếm</span>
-                  </div>
+                  <span>Tìm kiếm</span>
                 )}
               </button>
             </div>
@@ -327,7 +272,7 @@ export default function EmbedPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-5 p-3 sm:p-4 bg-red-50 border border-red-100 rounded-lg sm:rounded-xl">
+            <div className="mt-5 p-3 sm:p-4 bg-red-50 border border-red-100 rounded-lg">
               <div className="flex items-start gap-2.5">
                 <div className="flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
                   <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,7 +286,7 @@ export default function EmbedPage() {
         </div>
 
         {/* Gallery Section */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
           {/* Results Header */}
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center">
@@ -361,7 +306,7 @@ export default function EmbedPage() {
             {showResults && results.length > 0 && (
               <button
                 onClick={clearSearch}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-white border border-gray-200 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-white border border-gray-200 rounded-lg text-xs sm:text-sm font-medium text-gray-700"
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
@@ -384,19 +329,18 @@ export default function EmbedPage() {
               {(showResults ? results : galleryImages).map((image, index) => {
                 const imageId = 'image_id' in image ? image.image_id : image.id;
                 const imageUrl = image.url;
-                const confidence = 'confidence' in image ? image.confidence : null;
                 
                 return (
                   <div 
                     key={imageId} 
-                    className="group relative cursor-pointer"
+                    className="relative cursor-pointer"
                     onClick={() => openImage(imageUrl, index)}
                   >
-                    <div className="relative aspect-square overflow-hidden rounded-lg sm:rounded-xl bg-gray-100">
+                    <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
                       <img
                         src={imageUrl}
                         alt={`Photo ${imageId}`}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   </div>

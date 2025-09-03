@@ -231,14 +231,6 @@ export default function EmbedPage() {
         {/* Search Section */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#EC2789] to-[#522E90] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-[#EC2789] rounded-full animate-pulse"></div>
-            </div>
             <div>
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                 Tìm Ảnh Của Bạn
@@ -302,14 +294,6 @@ export default function EmbedPage() {
                     </button>
                   </div>
                 </div>
-                <div className="text-center">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#EC2789]/10 to-[#522E90]/10 text-[#522E90] rounded-full text-xs sm:text-sm font-medium">
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Sẵn sàng tìm kiếm
-                  </span>
-                </div>
               </div>
             )}
           </div>
@@ -333,10 +317,7 @@ export default function EmbedPage() {
                     <span>Đang tìm kiếm...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                  <div className="flex items-center">
                     <span>Tìm kiếm</span>
                   </div>
                 )}
@@ -363,12 +344,7 @@ export default function EmbedPage() {
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8">
           {/* Results Header */}
           <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#EC2789]/10 to-[#522E90]/10 rounded-lg sm:rounded-xl flex items-center justify-center">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#522E90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
+            <div className="flex items-center">
               <div>
                 <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">
                   {showResults ? 'Kết quả tìm kiếm' : 'Thư viện ảnh'}

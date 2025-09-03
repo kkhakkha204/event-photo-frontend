@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 
 interface SearchResult {
@@ -11,210 +11,17 @@ interface SearchResult {
   min_distance: number;
   avg_distance: number;
   face_count: number;
-  uploaded_at?: string;
+  uploaded_at?: string; // Make optional
 }
 
 interface GalleryImage {
   id: number;
   url: string;
-  uploaded_at?: string;
+  uploaded_at?: string; // Make optional
   face_count?: number;
   event_id?: number;
   processed?: number;
 }
-
-// LazyImage Component with IntersectionObserver
-const LazyImage = ({ 
-  src, 
-  alt, 
-  className, 
-  onClick,
-  confidence 
-}: { 
-  src: string; 
-  alt: string; 
-  className: string;
-  onClick: () => void;
-  confidence?: number | null;
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const imgRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.disconnect();
-        }
-      },
-      { 
-        rootMargin: '50px',
-        threshold: 0.1 
-      }
-    );
-
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  const handleLoad = useCallback(() => {
-    setIsLoaded(true);
-  }, []);
-
-  const handleError = useCallback(() => {
-    setHasError(true);
-    setIsLoaded(true);
-  }, []);
-
-  return (
-    <div 
-      ref={imgRef}
-      className="group relative cursor-pointer"
-      onClick={onClick}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-lg sm:rounded-xl bg-gray-100">
-        {/* Skeleton Loading */}
-        {!isLoaded && (
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse">
-            <div className="absolute inset-4 bg-gray-100 rounded opacity-50"></div>
-          </div>
-        )}
-
-        {/* Actual Image */}
-        {isInView && (
-          <>
-            {hasError ? (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            ) : (
-              <img
-                src={src}
-                alt={alt}
-                className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
-                onLoad={handleLoad}
-                onError={handleError}
-                loading="lazy"
-              />
-            )}
-          </>
-        )}
-
-        {/* Confidence Badge */}
-        {confidence !== null && confidence !== undefined && isLoaded && (
-          <div className="absolute top-2 right-2 transform group-hover:scale-110 transition-transform duration-300">
-            <div className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-md ${
-              confidence >= 0.8 
-                ? 'bg-green-500/90 text-white' 
-                : confidence >= 0.6
-                ? 'bg-yellow-500/90 text-white'
-                : 'bg-orange-500/90 text-white'
-            }`}>
-              {Math.round(confidence * 100)}%
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Virtual Grid Component
-const VirtualGrid = ({ 
-  items, 
-  isResults,
-  onImageClick 
-}: { 
-  items: (SearchResult | GalleryImage)[];
-  isResults: boolean;
-  onImageClick: (url: string, index: number) => void;
-}) => {
-  const [visibleCount, setVisibleCount] = useState(24);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  const loadMore = useCallback(() => {
-    if (isLoadingMore || visibleCount >= items.length) return;
-    
-    setIsLoadingMore(true);
-    // Debounced loading
-    setTimeout(() => {
-      setVisibleCount(prev => Math.min(prev + 12, items.length));
-      setIsLoadingMore(false);
-    }, 300);
-  }, [isLoadingMore, visibleCount, items.length]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          loadMore();
-        }
-      },
-      { rootMargin: '100px' }
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [loadMore]);
-
-  // Reset visible count when switching between results/gallery
-  useEffect(() => {
-    setVisibleCount(24);
-  }, [isResults]);
-
-  const visibleItems = items.slice(0, visibleCount);
-
-  return (
-    <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-        {visibleItems.map((image, index) => {
-          const imageId = 'image_id' in image ? image.image_id : image.id;
-          const imageUrl = image.url;
-          const confidence = 'confidence' in image ? image.confidence : null;
-          
-          return (
-            <LazyImage
-              key={`${isResults ? 'result' : 'gallery'}-${imageId}-${index}`}
-              src={imageUrl}
-              alt={`Photo ${imageId}`}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-              onClick={() => onImageClick(imageUrl, index)}
-              confidence={confidence}
-            />
-          );
-        })}
-      </div>
-
-      {/* Load More Trigger */}
-      {visibleCount < items.length && (
-        <div ref={loadMoreRef} className="py-8 flex justify-center">
-          {isLoadingMore ? (
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-5 border-2 border-[#EC2789]/30 border-t-[#EC2789] rounded-full animate-spin"></div>
-              <span className="text-sm text-gray-600">Đang tải thêm ảnh...</span>
-            </div>
-          ) : (
-            <div className="text-sm text-gray-500">
-              Hiển thị {visibleCount} / {items.length} ảnh
-            </div>
-          )}
-        </div>
-      )}
-    </>
-  );
-};
 
 export default function EmbedPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -248,8 +55,10 @@ export default function EmbedPage() {
   const loadGalleryImages = async () => {
     setLoadingGallery(true);
     try {
-      const response = await api.getAllImages(0, 100);
+      // Try smaller limit first
+      const response = await api.getAllImages(0, 100);  // Changed from 1000 to 100
       
+      // Check if response has images array
       if (response && response.images && Array.isArray(response.images)) {
         setGalleryImages(response.images);
         setTotal(response.total || response.images.length);
@@ -269,43 +78,16 @@ export default function EmbedPage() {
     }
   };
 
-  // File validation
-  const validateFile = useCallback((file: File): string | null => {
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    
-    if (file.size > maxSize) {
-      return 'Kích thước file không được vượt quá 10MB';
-    }
-    
-    if (!allowedTypes.includes(file.type)) {
-      return 'Chỉ hỗ trợ định dạng JPG, PNG, WEBP';
-    }
-    
-    return null;
-  }, []);
-
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    const validationError = validateFile(file);
-    if (validationError) {
-      setError(validationError);
-      return;
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setError('');
+      setResults([]);
+      setShowResults(false);
     }
-
-    // Cleanup previous preview URL
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
-    setError('');
-    setResults([]);
-    setShowResults(false);
-  }, [validateFile, previewUrl]);
+  };
 
   const handleSearch = async () => {
     if (!selectedFile) return;
@@ -339,34 +121,62 @@ export default function EmbedPage() {
     }
   };
 
-  const clearSearch = useCallback(() => {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
+  const clearSearch = () => {
     setSelectedFile(null);
     setPreviewUrl('');
     setResults([]);
     setShowResults(false);
     setError('');
-  }, [previewUrl]);
+  };
+
+  const getModeDescription = (modeType: 'strict' | 'balanced' | 'loose') => {
+    const descriptions = {
+      strict: 'Chính xác',
+      balanced: 'Cân bằng',
+      loose: 'Tìm rộng'
+    };
+    return descriptions[modeType];
+  };
+
+  const getModeIcon = (modeType: 'strict' | 'balanced' | 'loose') => {
+    if (modeType === 'strict') {
+      return (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    } else if (modeType === 'balanced') {
+      return (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+      );
+    } else {
+      return (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    }
+  };
 
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
 
-  const getCurrentImages = useCallback(() => {
+  const getCurrentImages = () => {
     return showResults ? results : galleryImages;
-  }, [showResults, results, galleryImages]);
+  };
 
-  const openImage = useCallback((url: string, index: number) => {
+  const openImage = (url: string, index: number) => {
     setSelectedImage(url);
     setSelectedImageIndex(index);
-  }, []);
+  };
 
-  const closeImage = useCallback(() => {
+  const closeImage = () => {
     setSelectedImage(null);
     setSelectedImageIndex(-1);
-  }, []);
+  };
 
-  const navigateImage = useCallback((direction: 'prev' | 'next') => {
+  const navigateImage = (direction: 'prev' | 'next') => {
     const images = getCurrentImages();
     if (selectedImageIndex === -1) return;
 
@@ -381,7 +191,7 @@ export default function EmbedPage() {
     const newUrl = newImage.url;
     setSelectedImage(newUrl);
     setSelectedImageIndex(newIndex);
-  }, [getCurrentImages, selectedImageIndex]);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -398,16 +208,7 @@ export default function EmbedPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedImage, selectedImageIndex, closeImage, navigateImage]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
+  }, [selectedImage, selectedImageIndex]);
 
   // Format date safely
   const formatDate = (dateString?: string) => {
@@ -475,7 +276,7 @@ export default function EmbedPage() {
                     <p className="text-sm sm:text-base font-medium text-gray-700">
                       {selectedFile ? selectedFile.name : 'Chọn ảnh chân dung'}
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1.5">PNG, JPG, WEBP (tối đa 10MB)</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1.5">PNG, JPG (tối đa 10MB)</p>
                   </div>
                 </label>
               </div>
@@ -565,7 +366,7 @@ export default function EmbedPage() {
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#EC2789]/10 to-[#522E90]/10 rounded-lg sm:rounded-xl flex items-center justify-center">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#522E90]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
               <div>
@@ -603,11 +404,44 @@ export default function EmbedPage() {
               <p className="text-sm sm:text-base text-gray-600 font-medium mt-5">Đang tải thư viện ảnh</p>
             </div>
           ) : (
-            <VirtualGrid 
-              items={showResults ? results : galleryImages}
-              isResults={showResults}
-              onImageClick={openImage}
-            />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+              {(showResults ? results : galleryImages).map((image, index) => {
+                const imageId = 'image_id' in image ? image.image_id : image.id;
+                const imageUrl = image.url;
+                const confidence = 'confidence' in image ? image.confidence : null;
+                
+                return (
+                  <div 
+                    key={imageId} 
+                    className="group relative cursor-pointer"
+                    onClick={() => openImage(imageUrl, index)}
+                  >
+                    <div className="relative aspect-square overflow-hidden rounded-lg sm:rounded-xl bg-gray-100">
+                      <img
+                        src={imageUrl}
+                        alt={`Photo ${imageId}`}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      />
+                      
+                      {/* Confidence Badge */}
+                      {showResults && confidence !== null && (
+                        <div className="absolute top-2 right-2 transform group-hover:scale-110 transition-transform duration-300">
+                          <div className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-md ${
+                            confidence >= 0.8 
+                              ? 'bg-green-500/90 text-white' 
+                              : confidence >= 0.6
+                              ? 'bg-yellow-500/90 text-white'
+                              : 'bg-orange-500/90 text-white'
+                          }`}>
+                            {Math.round(confidence * 100)}%
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
@@ -615,47 +449,14 @@ export default function EmbedPage() {
       {/* Lightbox Modal */}
       {selectedImage && (
         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center" onClick={closeImage}>
-          {/* Navigation arrows */}
-          {getCurrentImages().length > 1 && (
-            <>
-              <button
-                onClick={(e) => { e.stopPropagation(); navigateImage('prev'); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              
-              <button
-                onClick={(e) => { e.stopPropagation(); navigateImage('next'); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </>
-          )}
-
-          {/* Close button */}
           <button
             onClick={closeImage}
-            className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+            className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center"
           >
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-
-          {/* Image counter */}
-          {getCurrentImages().length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full">
-              <span className="text-white text-sm">
-                {selectedImageIndex + 1} / {getCurrentImages().length}
-              </span>
-            </div>
-          )}
           
           <img
             src={selectedImage}

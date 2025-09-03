@@ -398,21 +398,6 @@ export default function EmbedPage() {
                         alt={`Photo ${imageId}`}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                       />
-                      
-                      {/* Confidence Badge */}
-                      {showResults && confidence !== null && (
-                        <div className="absolute top-2 right-2 transform group-hover:scale-110 transition-transform duration-300">
-                          <div className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-md ${
-                            confidence >= 0.8 
-                              ? 'bg-green-500/90 text-white' 
-                              : confidence >= 0.6
-                              ? 'bg-yellow-500/90 text-white'
-                              : 'bg-orange-500/90 text-white'
-                          }`}>
-                            {Math.round(confidence * 100)}%
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 );

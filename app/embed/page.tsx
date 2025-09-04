@@ -229,7 +229,7 @@ export default function EmbedPage() {
   }, [selectedImage, closeImage]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
         {/* Search Section */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">

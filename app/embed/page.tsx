@@ -178,7 +178,7 @@ export default function EmbedPage() {
       const formData = new FormData();
       formData.append('file', selectedFile);
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/api/search?mode=balanced&limit=150`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/api/search?mode=balanced&limit=800`, {
         method: 'POST',
         body: formData
       });

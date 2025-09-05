@@ -250,7 +250,7 @@ export default function AdminPage() {
               <div className="mt-2 text-sm text-gray-600">
                 <p>Đã chọn {selectedFiles.length} ảnh</p>
                 <p className="text-xs text-blue-600">
-                  * Ảnh lớn hơn 5MB sẽ được tự động nén để tối ưu upload và face detection
+                  * Ảnh lớn hơn 7MB sẽ được tự động nén để tối ưu upload và face detection (target 9MB)
                 </p>
               </div>
             )}

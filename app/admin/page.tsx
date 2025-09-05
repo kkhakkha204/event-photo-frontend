@@ -250,7 +250,7 @@ export default function AdminPage() {
               <div className="mt-2 text-sm text-gray-600">
                 <p>Đã chọn {selectedFiles.length} ảnh</p>
                 <p className="text-xs text-blue-600">
-                  * Chỉ nén ảnh lớn hơn 8MB để giữ quality tối đa cho khách hàng download (target 9.5MB)
+                  * Chỉ nén ảnh 9MB để giữ chất lượng gần như nguyên bản (max 70% compression)
                 </p>
               </div>
             )}

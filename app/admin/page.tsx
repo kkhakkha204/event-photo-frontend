@@ -114,69 +114,53 @@ export default function AdminPage() {
   };
 
   const uploadFiles = async () => {
-    if (!selectedFiles || selectedFiles.length === 0) return;
+  if (!selectedFiles || selectedFiles.length === 0) return;
 
-    setUploading(true);
-    setProgress(0);
-    setCompressionProgress(0);
-    const uploadResults: UploadResult[] = [];
+  setUploading(true);
+  setProgress(0);
+  const uploadResults: UploadResult[] = [];
 
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      let processedFile: File | Blob = file;
-      let originalSize = file.size;
-      let compressedSize = file.size;
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
 
-      try {
-        // Compress image if it's too large or if it's an image
-        if (file.type.startsWith('image/') && (file.size > 5 * 1024 * 1024 || file.size > 10 * 1024 * 1024)) {
-          setCompressionProgress(((i + 0.5) / selectedFiles.length) * 100);
-          
-          const compressionResult = await compressImage(file);
-          processedFile = compressionResult.blob;
-          originalSize = compressionResult.originalSize;
-          compressedSize = compressionResult.compressedSize;
-          
-          console.log(`Compressed ${file.name}: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}`);
-        }
+    try {
+      const formData = new FormData();
+      formData.append('file', file); // Gửi file gốc, không nén
 
-        const formData = new FormData();
-        formData.append('file', processedFile, file.name);
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
-          method: 'POST',
-          body: formData
-        });
-        
-        const data = await res.json();
-        
-        uploadResults.push({
-          file: file.name,
-          success: data.success,
-          url: data.url,
-          faces_detected: data.faces_detected,
-          error: data.error || (res.ok ? undefined : data.detail),
-          original_size: formatFileSize(originalSize),
-          compressed_size: compressedSize !== originalSize ? formatFileSize(compressedSize) : undefined
-        });
-        
-      } catch (error) {
-        console.error(`Error processing ${file.name}:`, error);
-        uploadResults.push({
-          file: file.name,
-          success: false,
-          error: error instanceof Error ? error.message : 'Processing failed',
-          original_size: formatFileSize(originalSize)
-        });
-      }
-
-      setProgress(((i + 1) / selectedFiles.length) * 100);
-      setCompressionProgress(0);
-      setResults([...uploadResults]);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await res.json();
+      
+      uploadResults.push({
+        file: file.name,
+        success: data.success,
+        url: data.url,
+        faces_detected: data.faces_detected,
+        error: data.error || (res.ok ? undefined : data.detail),
+        original_size: formatFileSize(file.size),
+        compressed_size: data.compression_info?.compressed_size_mb ? 
+          formatFileSize(data.compression_info.compressed_size_mb * 1024 * 1024) : undefined
+      });
+      
+    } catch (error) {
+      console.error(`Error processing ${file.name}:`, error);
+      uploadResults.push({
+        file: file.name,
+        success: false,
+        error: error instanceof Error ? error.message : 'Processing failed',
+        original_size: formatFileSize(file.size)
+      });
     }
 
-    setUploading(false);
-  };
+    setProgress(((i + 1) / selectedFiles.length) * 100);
+    setResults([...uploadResults]);
+  }
+
+  setUploading(false);
+};
 
   const clearAllData = async () => {
     if (!confirm('⚠️ BẠN CHẮC CHẮN MUỐN XÓA TẤT CẢ DỮ LIỆU?\nHành động này không thể hoàn tác!')) {

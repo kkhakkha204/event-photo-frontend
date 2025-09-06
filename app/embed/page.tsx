@@ -229,11 +229,11 @@ export default function EmbedPage() {
   }, [selectedImage, closeImage]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 p-2 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Search Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 md:p-8">
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Upload Area */}
             <div className="space-y-4">

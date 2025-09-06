@@ -129,7 +129,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Results */}
+          {/* Resultss */}
           {results.length > 0 && (
             <div className="mt-8">
               <h2 className="text-lg font-semibold mb-4">

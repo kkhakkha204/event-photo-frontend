@@ -291,19 +291,19 @@ export default function EmbedPage() {
                 <div className="space-y-2 text-sm text-blue-700">
                   <div className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Ảnh rõ nét:</strong> Tránh ảnh mờ, nhòe, hoặc bị lắc</span>
+                    <span>Tránh ảnh mờ, nhòe, hoặc bị lắc</span>
                   </div>
                   <div className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Mặt thẳng:</strong> Người trong ảnh nhìn thẳng về phía camera</span>
+                    <span>Người trong ảnh nhìn thẳng về phía camera</span>
                   </div>
                   <div className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Ánh sáng tốt:</strong> Khuôn mặt được chiếu sáng đều</span>
+                    <span>Khuôn mặt được chiếu sáng đều</span>
                   </div>
                   <div className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Không che khuất:</strong> Khuôn mặt không bị kính, mũ, tóc che</span>
+                    <span>Khuôn mặt không bị kính, mũ, tóc che</span>
                   </div>
                 </div>
               </div>

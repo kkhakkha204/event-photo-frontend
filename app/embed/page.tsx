@@ -231,11 +231,6 @@ export default function EmbedPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center py-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Tìm Ảnh Của Bạn</h1>
-          <p className="text-gray-600">Tải lên ảnh chân dung để tìm kiếm trong bộ sưu tập</p>
-        </div>
 
         {/* Search Section */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">

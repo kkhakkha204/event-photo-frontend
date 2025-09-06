@@ -299,7 +299,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Results */}
+          {/* Resultss */}
           {results.length > 0 && (
             <div className="mt-8">
               <div className="mb-4">

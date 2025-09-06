@@ -15,6 +15,7 @@ export default function AdminPage() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [results, setResults] = useState<UploadResult[]>([]);
   const [progress, setProgress] = useState(0);
+  const [deleting, setDeleting] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFiles(e.target.files);
@@ -62,6 +63,31 @@ export default function AdminPage() {
     setUploading(false);
   };
 
+  const clearAllData = async () => {
+    if (!confirm('⚠️ BẠN CHẮC CHẮN MUỐN XÓA TẤT CẢ DỮ LIỆU?\nHành động này không thể hoàn tác!')) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/clear-all`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        alert('✅ Đã xóa tất cả dữ liệu thành công');
+        setResults([]);
+        setSelectedFiles(null);
+      } else {
+        alert('❌ Lỗi: ' + data.message);
+      }
+    } catch (error) {
+      alert('❌ Lỗi khi xóa dữ liệu');
+    }
+    setDeleting(false);
+  };
+
   const totalFaces = results.reduce((sum, r) => sum + (r.faces_detected || 0), 0);
   const successCount = results.filter(r => r.success).length;
 
@@ -106,16 +132,27 @@ export default function AdminPage() {
             )}
           </div>
 
-          {/* Upload Button */}
-          <button
-            onClick={uploadFiles}
-            disabled={!selectedFiles || uploading}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold
-              disabled:bg-gray-400 disabled:cursor-not-allowed
-              hover:bg-blue-700 transition-colors"
-          >
-            {uploading ? `Đang upload... ${Math.round(progress)}%` : 'Upload Tất Cả'}
-          </button>
+          {/* Buttons */}
+          <div className="space-y-4">
+            <button
+              onClick={uploadFiles}
+              disabled={!selectedFiles || uploading}
+              className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold
+                disabled:bg-gray-400 disabled:cursor-not-allowed
+                hover:bg-blue-700 transition-colors"
+            >
+              {uploading ? `Đang upload... ${Math.round(progress)}%` : 'Upload Tất Cả'}
+            </button>
+
+            <button
+              onClick={clearAllData}
+              disabled={deleting}
+              className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold
+                hover:bg-red-700 transition-colors disabled:opacity-50"
+            >
+              {deleting ? 'Đang xóa...' : '🗑️ Xóa Tất Cả Dữ Liệu Database'}
+            </button>
+          </div>
 
           {/* Progress Bar */}
           {uploading && (

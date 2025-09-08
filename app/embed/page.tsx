@@ -290,17 +290,14 @@ export default function EmbedPage() {
                       <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="text-xs font-semibold text-green-700">Ảnh mẫu tốt</span>
+                      <span className="text-xs text-center font-semibold text-green-700">Tải ảnh tương tự như sau:</span>
                     </div>
-                    <div className="flex-1 relative overflow-hidden rounded-lg">
+                    <div className="flex-1 relative overflow-hidden rounded-lg bg-green-50">
                       <img 
                         src="/placeholder.png" 
                         alt="Ảnh mẫu" 
                         className="w-full h-full object-contain bg-white border border-green-200"
                       />
-                      <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded text-center">
-                        Chân dung cận cảnh
-                      </div>
                     </div>
                   </div>
                 </div>

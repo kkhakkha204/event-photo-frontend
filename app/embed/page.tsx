@@ -268,10 +268,10 @@ export default function EmbedPage() {
                       <>
                         <div className="w-16 h-16 mb-4 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto">
                           <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
-                        <p className="font-semibold text-gray-700 mb-2">Chọn ảnh chân dung</p>
+                        <p className="font-semibold text-gray-700 mb-2">Tải ảnh chân dung cận cảnh</p>
                         <p className="text-sm text-gray-500">Kéo thả hoặc click để chọn</p>
                         <p className="text-xs text-gray-400 mt-2">PNG, JPG (tối đa 10MB)</p>
                       </>
@@ -280,31 +280,36 @@ export default function EmbedPage() {
                 </label>
               </div>
 
-              {/* Tips */}
+              {/* Enhanced Tips */}
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
                 <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
-                  Mẹo để có kết quả tốt nhất
+                  Để có kết quả tốt nhất
                 </h4>
                 <div className="space-y-2 text-sm text-blue-700">
                   <div className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span>Tránh ảnh mờ, nhòe, hoặc bị lắc</span>
+                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span><strong>Chụp từ ngực trở lên</strong> - ảnh chân dung cận cảnh cho kết quả tốt nhất</span>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span><strong>Ảnh rõ nét</strong> - tránh ảnh mờ, bị lắc hoặc độ phân giải thấp</span>
                   </div>
                   <div className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span>Người trong ảnh nhìn thẳng về phía camera</span>
+                    <span>Nhìn thẳng về phía camera, khuôn mặt không bị che</span>
                   </div>
                   <div className="flex items-start">
                     <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span>Khuôn mặt được chiếu sáng đều</span>
+                    <span>Ánh sáng đều, tránh quá tối hoặc quá sáng</span>
                   </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span>Khuôn mặt không bị kính, mũ, tóc che</span>
-                  </div>
+                </div>
+                <div className="mt-3 p-2 bg-green-50 rounded-lg border border-green-200">
+                  <p className="text-xs text-green-700 font-medium">
+                    💡 <strong>Mẹo:</strong> Ảnh chân dung cận cảnh (từ ngực trở lên) sẽ cho kết quả gấp 2-3 lần so với ảnh toàn thân
+                  </p>
                 </div>
               </div>
             </div>
@@ -364,7 +369,14 @@ export default function EmbedPage() {
                 <svg className="w-5 h-5 text-red-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-sm text-red-700">{error}</p>
+                <div>
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                  {error.includes('Không tìm thấy') && (
+                    <p className="text-xs text-red-600 mt-1">
+                      Thử sử dụng ảnh chân dung cận cảnh và rõ nét hơn để có kết quả tốt nhất
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}

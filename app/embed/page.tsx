@@ -209,10 +209,14 @@ export default function EmbedPage() {
   }, []);
 
   const openImage = useCallback((url: string) => {
+    // Lock body scroll when opening lightbox
+    document.body.style.overflow = 'hidden';
     setSelectedImage(url);
   }, []);
 
   const closeImage = useCallback(() => {
+    // Restore body scroll when closing lightbox
+    document.body.style.overflow = '';
     setSelectedImage(null);
   }, []);
 
@@ -227,6 +231,13 @@ export default function EmbedPage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedImage, closeImage]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 md:p-6">
@@ -314,19 +325,15 @@ export default function EmbedPage() {
                 <ul className="space-y-1.5 text-xs text-blue-700">
                   <li className="flex items-start">
                     <span className="inline-block w-1 h-1 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span><strong>Chụp từ ngực trở lên</strong> - ảnh cận cảnh cho kết quả tốt nhất</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1 h-1 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span><strong>Ảnh rõ nét</strong> - tránh ảnh mờ hoặc độ phân giải thấp</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-block w-1 h-1 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span>Nhìn thẳng về phía camera, khuôn mặt không bị che</span>
+                    <span><strong>Ảnh rõ nét</strong> - tránh ảnh bị vỡ hoặc mờ</span>
                   </li>
                   <li className="flex items-start">
                     <span className="inline-block w-1 h-1 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
                     <span>Ánh sáng đều, tránh quá tối hoặc quá sáng</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block w-1 h-1 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                    <span>Sẽ có tỷ lệ xuất hiện ảnh không có mặt bạn, nhưng các ảnh chính xác sẽ được đẩy lên đầu</span>
                   </li>
                 </ul>
               </div>
@@ -499,10 +506,22 @@ export default function EmbedPage() {
 
       {/* Lightbox Modal */}
       {selectedImage && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" onClick={closeImage}>
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4" 
+          onClick={closeImage}
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh'
+          }}
+        >
           <button
             onClick={closeImage}
-            className="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors z-10"
+            className="absolute top-4 right-4 w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors z-[10000]"
             title="Đóng (ESC)"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -510,12 +529,15 @@ export default function EmbedPage() {
             </svg>
           </button>
           
-          <img
-            src={selectedImage}
-            alt="Ảnh phóng to"
-            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              src={selectedImage}
+              alt="Ảnh phóng to"
+              className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              style={{ position: 'relative' }}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -298,9 +298,6 @@ export default function EmbedPage() {
                         alt="Ảnh mẫu" 
                         className="w-full h-[60%] object-contain rounded-lg"
                       />
-                      <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded text-center">
-                        Chân dung cận cảnh
-                      </div>
                     </div>
                   </div>
                 </div>

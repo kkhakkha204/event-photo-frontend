@@ -233,155 +233,168 @@ export default function EmbedPage() {
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Search Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 md:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-8">
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Upload Area */}
-            <div className="space-y-4">
-              {/* Example Image */}
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-gray-800">Ảnh mẫu tốt nhất</h3>
-                </div>
+            {/* Left Column - Upload & Example */}
+            <div className="space-y-6">
+              {/* Upload Area with Example Side by Side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Upload Zone */}
                 <div className="relative">
-                  <img 
-                    src="/placeholder.png" 
-                    alt="Ảnh mẫu chân dung cận cảnh" 
-                    className="w-full max-w-48 h-auto rounded-xl shadow-lg border border-gray-200 object-cover"
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    id="file-upload-embed"
                   />
-                  <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1.5 rounded-lg text-center">
-                    <span className="font-medium">Chân dung cận cảnh, rõ nét</span>
+                  <label 
+                    htmlFor="file-upload-embed"
+                    className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                      selectedFile 
+                        ? 'border-blue-400 bg-blue-50' 
+                        : 'border-gray-300 bg-gray-50 hover:border-blue-300 hover:bg-blue-25'
+                    }`}
+                  >
+                    <div className="text-center p-4">
+                      {selectedFile ? (
+                        <>
+                          <div className="w-12 h-12 mb-2 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <p className="font-medium text-sm text-gray-800 mb-1 truncate max-w-[150px] mx-auto">{selectedFile.name}</p>
+                          <p className="text-xs text-blue-600">Sẵn sàng tìm kiếm</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-12 h-12 mb-2 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+                            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <p className="font-medium text-sm text-gray-700 mb-1">Tải ảnh lên</p>
+                          <p className="text-xs text-gray-500">Click hoặc kéo thả</p>
+                          <p className="text-xs text-gray-400 mt-1">PNG, JPG (max 10MB)</p>
+                        </>
+                      )}
+                    </div>
+                  </label>
+                </div>
+
+                {/* Example Image */}
+                <div className="flex flex-col">
+                  <div className="bg-green-50 rounded-xl p-3 h-48 flex flex-col">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-xs font-semibold text-green-700">Ảnh mẫu tốt</span>
+                    </div>
+                    <div className="flex-1 relative">
+                      <img 
+                        src="/placeholder.png" 
+                        alt="Ảnh mẫu" 
+                        className="w-full h-full object-cover rounded-lg border border-green-200"
+                      />
+                      <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded text-center">
+                        Chân dung cận cảnh
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  id="file-upload-embed"
-                />
-                <label 
-                  htmlFor="file-upload-embed"
-                  className={`flex flex-col items-center justify-center w-full h-56 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-200 ${
-                    selectedFile 
-                      ? 'border-blue-400 bg-blue-50' 
-                      : 'border-gray-300 bg-gray-50 hover:border-blue-300 hover:bg-blue-25'
-                  }`}
-                >
-                  <div className="text-center p-6">
-                    {selectedFile ? (
-                      <>
-                        <div className="w-16 h-16 mb-4 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto">
-                          <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                        <p className="font-semibold text-gray-800 mb-1">{selectedFile.name}</p>
-                        <p className="text-sm text-blue-600">Sẵn sàng tìm kiếm</p>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-16 h-16 mb-4 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <p className="font-semibold text-gray-700 mb-2">Tải ảnh chân dung của bạn</p>
-                        <p className="text-sm text-gray-500">Kéo thả hoặc click để chọn</p>
-                        <p className="text-xs text-gray-400 mt-2">PNG, JPG (tối đa 10MB)</p>
-                      </>
-                    )}
-                  </div>
-                </label>
-              </div>
-
-              {/* Enhanced Tips */}
+              {/* Tips Section */}
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h4 className="font-semibold text-blue-800 mb-3 text-sm flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                   Để có kết quả tốt nhất
                 </h4>
-                <div className="space-y-2 text-sm text-blue-700">
-                  <div className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Chụp từ ngực trở lên</strong> - ảnh chân dung cận cảnh cho kết quả tốt nhất</span>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Ảnh rõ nét</strong> - tránh ảnh mờ, bị lắc hoặc độ phân giải thấp</span>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                <ul className="space-y-1.5 text-xs text-blue-700">
+                  <li className="flex items-start">
+                    <span className="inline-block w-1 h-1 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                    <span><strong>Chụp từ ngực trở lên</strong> - ảnh cận cảnh cho kết quả tốt nhất</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block w-1 h-1 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                    <span><strong>Ảnh rõ nét</strong> - tránh ảnh mờ hoặc độ phân giải thấp</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block w-1 h-1 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
                     <span>Nhìn thẳng về phía camera, khuôn mặt không bị che</span>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="inline-block w-1 h-1 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
                     <span>Ánh sáng đều, tránh quá tối hoặc quá sáng</span>
-                  </div>
-                </div>
-                <div className="mt-3 p-2 bg-green-50 rounded-lg border border-green-200">
-                  <p className="text-xs text-green-700 font-medium">
-                    💡 <strong>Mẹo:</strong> Ảnh chân dung cận cảnh (từ ngực trở lên) sẽ cho kết quả gấp 2-3 lần so với ảnh toàn thân
-                  </p>
-                </div>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            {/* Preview */}
-            {previewUrl && (
-              <div className="space-y-4">
-                <div className="relative rounded-2xl overflow-hidden shadow-lg bg-white">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="w-full h-56 object-contain bg-gray-50"
-                  />
-                  <button
-                    onClick={clearSearch}
-                    className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-colors"
-                    title="Xóa ảnh"
-                  >
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Search Button */}
-                <button
-                  onClick={handleSearch}
-                  disabled={searching}
-                  className={`w-full py-4 rounded-xl font-semibold text-white transition-all duration-200 ${
-                    searching 
-                      ? 'bg-gray-300 cursor-not-allowed' 
-                      : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl'
-                  }`}
-                >
-                  {searching ? (
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Đang tìm kiếm...
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            {/* Right Column - Preview & Search */}
+            <div className="space-y-4">
+              {previewUrl ? (
+                <>
+                  {/* Preview Image */}
+                  <div className="relative rounded-xl overflow-hidden shadow-lg bg-white">
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-full h-64 object-contain bg-gray-50"
+                    />
+                    <button
+                      onClick={clearSearch}
+                      className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white"
+                      title="Xóa ảnh"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                      Tìm kiếm ảnh
-                    </div>
-                  )}
-                </button>
-              </div>
-            )}
+                    </button>
+                  </div>
+
+                  {/* Search Button */}
+                  <button
+                    onClick={handleSearch}
+                    disabled={searching}
+                    className={`w-full py-3.5 rounded-xl font-semibold text-white transition-all ${
+                      searching 
+                        ? 'bg-gray-300 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl'
+                    }`}
+                  >
+                    {searching ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Đang tìm kiếm...
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        Tìm kiếm ảnh
+                      </div>
+                    )}
+                  </button>
+                </>
+              ) : (
+                /* Placeholder when no image selected */
+                <div className="h-full flex items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 min-h-[320px]">
+                  <div className="text-center p-6">
+                    <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-gray-500 font-medium mb-2">Xem trước ảnh</p>
+                    <p className="text-gray-400 text-sm">Tải ảnh lên để bắt đầu tìm kiếm</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Error Message */}
@@ -405,13 +418,13 @@ export default function EmbedPage() {
         </div>
 
         {/* Gallery Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
                 {showResults ? 'Kết quả tìm kiếm' : 'Thư viện ảnh'}
               </h2>
-              <p className="text-gray-500">
+              <p className="text-sm text-gray-500">
                 {showResults 
                   ? `Tìm thấy ${results.length} ảnh phù hợp`
                   : `Tổng cộng ${total.toLocaleString()} ảnh trong bộ sưu tập`
@@ -422,7 +435,7 @@ export default function EmbedPage() {
             {showResults && (
               <button
                 onClick={clearSearch}
-                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 transition-colors"
+                className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,11 +474,11 @@ export default function EmbedPage() {
 
               {/* Load More Button */}
               {!showResults && hasMore && (
-                <div className="text-center mt-10">
+                <div className="text-center mt-8">
                   <button
                     onClick={loadMore}
                     disabled={loadingGallery}
-                    className={`px-8 py-4 rounded-xl font-semibold transition-all duration-200 ${
+                    className={`px-6 py-3 rounded-xl font-semibold transition-all ${
                       loadingGallery
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
@@ -473,7 +486,7 @@ export default function EmbedPage() {
                   >
                     {loadingGallery ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 border-2 border-gray-400 border-t-gray-600 rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-gray-400 border-t-gray-600 rounded-full animate-spin" />
                         Đang tải...
                       </div>
                     ) : (

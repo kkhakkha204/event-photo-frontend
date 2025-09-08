@@ -209,9 +209,18 @@ export default function EmbedPage() {
   }, []);
 
   const openImage = useCallback((url: string) => {
-    // Lock body scroll when opening lightbox
-    document.body.style.overflow = 'hidden';
-    setSelectedImage(url);
+    // Check if we're in an iframe
+    if (window.parent !== window) {
+      // Send message to parent to open image in full screen
+      window.parent.postMessage({ 
+        type: 'openImage', 
+        url: url 
+      }, '*');
+    } else {
+      // Normal behavior if not in iframe
+      document.body.style.overflow = 'hidden';
+      setSelectedImage(url);
+    }
   }, []);
 
   const closeImage = useCallback(() => {

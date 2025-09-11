@@ -209,19 +209,33 @@ export default function EmbedPage() {
   }, []);
 
   const openImage = useCallback((url: string) => {
-    // Check if we're in an iframe
-    if (window.parent !== window) {
-      // Send message to parent to open image in full screen
-      window.parent.postMessage({ 
-        type: 'openImage', 
-        url: url 
-      }, '*');
-    } else {
-      // Normal behavior if not in iframe
-      document.body.style.overflow = 'hidden';
-      setSelectedImage(url);
+  // Debug log
+  console.log('Opening image:', url);
+  
+  // Check if we're in an iframe
+  if (window.parent !== window) {
+    // Send message to parent with full URL
+    const message = { 
+      type: 'openImage', 
+      url: url 
+    };
+    
+    console.log('Sending message to parent:', message);
+    
+    // Try multiple methods to ensure message is sent
+    try {
+      window.parent.postMessage(message, '*');
+      // Also try specific origin
+      window.parent.postMessage(message, window.location.origin);
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
-  }, []);
+  } else {
+    // Normal behavior if not in iframe
+    document.body.style.overflow = 'hidden';
+    setSelectedImage(url);
+  }
+}, []);
 
   const closeImage = useCallback(() => {
     // Restore body scroll when closing lightbox

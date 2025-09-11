@@ -208,20 +208,68 @@ export default function EmbedPage() {
     setError('');
   }, []);
 
-  const openImage = useCallback((url: string) => {
-    // Check if we're in an iframe
-    if (window.parent !== window) {
-      // Send message to parent to open image in full screen
+  // Sửa lại hàm openImage trong component gốc của bạn
+const openImage = useCallback((url: string) => {
+  // Correct way to check if we're in an iframe
+  const isInIframe = () => {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true; // If we can't access window.top, we're definitely in an iframe
+    }
+  };
+
+  if (isInIframe()) {
+    // Send message to parent to open image in full screen
+    try {
       window.parent.postMessage({ 
         type: 'openImage', 
         url: url 
       }, '*');
-    } else {
-      // Normal behavior if not in iframe
+      console.log('Message sent to parent for image:', url);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      // Fallback to internal lightbox
       document.body.style.overflow = 'hidden';
       setSelectedImage(url);
     }
-  }, []);
+  } else {
+    // Normal behavior if not in iframe
+    document.body.style.overflow = 'hidden';
+    setSelectedImage(url);
+  }
+}, []);
+
+// Cũng sửa lại phần resize observer
+useEffect(() => {
+  const sendHeight = () => {
+    const height = document.body.scrollHeight;
+    
+    const isInIframe = () => {
+      try {
+        return window.self !== window.top;
+      } catch (e) {
+        return true;
+      }
+    };
+
+    if (isInIframe()) {
+      try {
+        window.parent.postMessage({ type: 'resize', height }, '*');
+      } catch (e) {
+        console.error('Cannot send resize message:', e);
+      }
+    }
+  };
+  
+  const observer = new ResizeObserver(sendHeight);
+  observer.observe(document.body);
+  
+  // Also send initial height
+  sendHeight();
+  
+  return () => observer.disconnect();
+}, []);
 
   const closeImage = useCallback(() => {
     // Restore body scroll when closing lightbox
